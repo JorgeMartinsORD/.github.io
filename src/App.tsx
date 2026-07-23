@@ -1,9 +1,23 @@
+import { useState } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { Login } from './components/Login';
+import { ListaAlunos } from './components/ListaAlunos';
+import { TelaAluno } from './components/TelaAluno';
 import './App.css';
+
+interface Aluno {
+  id: string;
+  nome: string;
+  email: string;
+  telefone: string;
+  data_nascimento: string;
+  disciplinas: any[];
+}
 
 const AppContent = () => {
   const { professor, loading } = useAuth();
+  const [telaAtual, setTelaAtual] = useState<'lista' | 'detalhe'>('lista');
+  const [alunoSelecionado, setAlunoSelecionado] = useState<Aluno | null>(null);
 
   if (loading) {
     return (
@@ -22,19 +36,27 @@ const AppContent = () => {
     <div className="dashboard">
       <header className="dashboard-header">
         <h1>🎵 Plataforma IA Professores</h1>
-        <div>
-          <p>Bem-vindo, {professor.nome || professor.email}</p>
+        <div className="professor-info">
+          <p>{professor.nome || professor.email}</p>
         </div>
       </header>
+
       <main className="dashboard-content">
-        <h2>Dashboard (em desenvolvimento)</h2>
-        <p>Próximos passos:</p>
-        <ul>
-          <li>✅ Login funcionando</li>
-          <li>⏳ Lista de alunos</li>
-          <li>⏳ Tela do aluno</li>
-          <li>⏳ Gerar plano</li>
-        </ul>
+        {telaAtual === 'lista' ? (
+          <ListaAlunos
+            onSelectAluno={(aluno) => {
+              setAlunoSelecionado(aluno);
+              setTelaAtual('detalhe');
+            }}
+          />
+        ) : (
+          alunoSelecionado && (
+            <TelaAluno
+              aluno={alunoSelecionado}
+              onVoltar={() => setTelaAtual('lista')}
+            />
+          )
+        )}
       </main>
     </div>
   );
