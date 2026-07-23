@@ -14,12 +14,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
+          // Traz professor do Supabase
           const { data: prof } = await supabase
             .from('professores')
             .select('*')
             .eq('id', session.user.id)
             .single();
-          setProfessor(prof);
+
+          // Se tem professor, tenta sincronizar com Emusys
+          if (prof) {
+            syncWithEmusys(prof, session.user.email!);
+            setProfessor(prof);
+          }
         }
       } catch (err) {
         console.error('Auth check error:', err);
@@ -37,7 +43,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           .select('*')
           .eq('id', session.user.id)
           .single()
-          .then(({ data }) => setProfessor(data));
+          .then(({ data }) => {
+            if (data) {
+              syncWithEmusys(data, session.user.email!);
+              setProfessor(data);
+            }
+          });
       } else {
         setProfessor(null);
       }
@@ -45,6 +56,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     return () => subscription?.unsubscribe();
   }, []);
+
+  // Sincroniza professor com Emusys (traz nome, telefone, etc)
+  const syncWithEmusys = async (prof: Professor, email: string) => {
+    try {
+      const response = await fetch(`/api/professor?email=${encodeURIComponent(email)}`);
+      if (response.ok) {
+        const emusysProf = await response.json();
+        
+        // Atualiza professor com dados do Emusys
+        if (emusysProf?.pessoa?.nome) {
+          await supabase
+            .from('professores')
+            .update({
+              nome: emusysProf.pessoa.nome,
+              email: emusysProf.pessoa.email || email,
+            })
+            .eq('id', prof.id);
+        }
+      }
+    } catch (err) {
+      // Emusys pode não ter o professor, e tudo bem
+      console.log('Emusys sync opcional:', err);
+    }
+  };
 
   const login = async (email: string, password: string) => {
     setError(null);
@@ -54,6 +89,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         password,
       });
       if (authError) throw authError;
+      // Não precisa fazer nada aqui - onAuthStateChange vai cuidar
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Erro ao fazer login';
       setError(message);
