@@ -8,27 +8,37 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [professor, setProfessor] = useState<Professor | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [debugInfo, setDebugInfo] = useState<any>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
+        console.log('🔍 Session:', session?.user?.email, session?.user?.id);
+        
         if (session?.user) {
-          // Traz professor do Supabase
-          const { data: prof } = await supabase
+          // Tenta trazer professor
+          const { data: prof, error: queryError } = await supabase
             .from('professores')
             .select('*')
             .eq('id', session.user.id)
             .single();
 
-          // Se tem professor, tenta sincronizar com Emusys
+          console.log('🔍 Professor query result:', prof, queryError);
+          setDebugInfo({ sessionId: session.user.id, sessionEmail: session.user.email, profData: prof, profError: queryError });
+
           if (prof) {
+            // Se tem professor, tenta sincronizar com Emusys
             syncWithEmusys(prof, session.user.email!);
             setProfessor(prof);
+          } else if (queryError) {
+            console.error('❌ Erro ao buscar professor:', queryError);
+            setError(`Professor não encontrado: ${queryError.message}`);
           }
         }
       } catch (err) {
-        console.error('Auth check error:', err);
+        console.error('❌ Auth check error:', err);
+        setError(String(err));
       } finally {
         setLoading(false);
       }
@@ -37,16 +47,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     checkAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log('🔍 Auth state changed:', _event, session?.user?.email);
       if (session?.user) {
         supabase
           .from('professores')
           .select('*')
           .eq('id', session.user.id)
           .single()
-          .then(({ data }) => {
+          .then(({ data, error }) => {
+            console.log('🔍 onAuthStateChange professor:', data, error);
             if (data) {
               syncWithEmusys(data, session.user.email!);
               setProfessor(data);
+            } else if (error) {
+              console.error('❌ onAuthStateChange error:', error);
+              setError(`Professor não encontrado após login`);
             }
           });
       } else {
@@ -57,14 +72,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => subscription?.unsubscribe();
   }, []);
 
-  // Sincroniza professor com Emusys (traz nome, telefone, etc)
   const syncWithEmusys = async (prof: Professor, email: string) => {
     try {
       const response = await fetch(`/api/professor?email=${encodeURIComponent(email)}`);
       if (response.ok) {
         const emusysProf = await response.json();
+        console.log('✅ Emusys sync OK:', emusysProf);
         
-        // Atualiza professor com dados do Emusys
         if (emusysProf?.pessoa?.nome) {
           await supabase
             .from('professores')
@@ -76,8 +90,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
       }
     } catch (err) {
-      // Emusys pode não ter o professor, e tudo bem
-      console.log('Emusys sync opcional:', err);
+      console.log('⚠️ Emusys sync opcional:', err);
     }
   };
 
@@ -89,10 +102,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         password,
       });
       if (authError) throw authError;
-      // Não precisa fazer nada aqui - onAuthStateChange vai cuidar
+      console.log('✅ Login bem-sucedido');
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Erro ao fazer login';
       setError(message);
+      console.error('❌ Login error:', message);
       throw err;
     }
   };
@@ -108,6 +122,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       throw err;
     }
   };
+
+  // Expõe debugInfo pra testes
+  (window as any).authDebug = debugInfo;
 
   return (
     <AuthContext.Provider value={{ professor, loading, error, login, logout }}>

@@ -103,3 +103,31 @@
 .btn-detalhes:hover {
   transform: scale(1.02);
 }
+
+.debug-info {
+  margin-top: 1rem;
+  cursor: pointer;
+}
+
+.debug-info summary {
+  color: #667eea;
+  font-weight: 600;
+  padding: 0.5rem;
+  border-radius: 4px;
+  background: rgba(102, 126, 234, 0.1);
+}
+
+.debug-info summary:hover {
+  background: rgba(102, 126, 234, 0.2);
+}
+
+.debug-info ul {
+  margin-top: 0.5rem;
+  margin-left: 1.5rem;
+  color: #666;
+}
+
+.debug-info li {
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+}

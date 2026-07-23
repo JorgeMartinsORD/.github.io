@@ -15,14 +15,19 @@ export const ListaAlunos = ({ onSelectAluno }: { onSelectAluno: (aluno: Aluno) =
   const { getAlunos, loading, error } = useEmusys();
   const [alunos, setAlunos] = useState<Aluno[]>([]);
   const [filtroStatus, setFiltroStatus] = useState('ativa');
+  const [localError, setLocalError] = useState<string | null>(null);
 
   useEffect(() => {
     const carregarAlunos = async () => {
+      setLocalError(null);
       try {
         const data = await getAlunos(filtroStatus);
         setAlunos(data.items || []);
       } catch (err) {
+        // Se der erro (ex: sem alunos vinculados), mostra mensagem amigável
         console.error('Erro ao carregar alunos:', err);
+        setLocalError('Nenhum aluno encontrado com este filtro. Isto é normal se seu email não tem alunos no Emusys.');
+        setAlunos([]);
       }
     };
 
@@ -46,9 +51,23 @@ export const ListaAlunos = ({ onSelectAluno }: { onSelectAluno: (aluno: Aluno) =
       </header>
 
       {loading && <p className="loading">Carregando alunos...</p>}
-      {error && <p className="error">Erro: {error}</p>}
+      
+      {(error || localError) && (
+        <div className="error-message">
+          <p>⚠️ {error || localError}</p>
+          <details className="debug-info">
+            <summary>Dicas</summary>
+            <ul>
+              <li>Seu email deve estar cadastrado como professor no Emusys</li>
+              <li>Verifique se tem alunos vinculados a você</li>
+              <li>Tente trocar o filtro (Todas, Finalizadas, etc)</li>
+              <li>Se nenhum aluno aparecer, é porque não há matrícula ativa com esse email</li>
+            </ul>
+          </details>
+        </div>
+      )}
 
-      {!loading && alunos.length === 0 && (
+      {!loading && alunos.length === 0 && !error && !localError && (
         <p className="vazio">Nenhum aluno encontrado</p>
       )}
 
