@@ -1,6 +1,9 @@
 name = "plataforma-ia-professores"
 pages_build_output_dir = "dist"
-main = "dist/index.html"
 
 [env.production]
 name = "plataforma-ia-professores"
+
+[[r2.bindings]]
+bucket_name = "plataforma-ia-professores"
+binding = "FILES"
