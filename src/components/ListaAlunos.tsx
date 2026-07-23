@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
 import { useEmusys } from '../hooks/useEmusys';
 import './ListaAlunos.css';
 
@@ -13,7 +12,6 @@ interface Aluno {
 }
 
 export const ListaAlunos = ({ onSelectAluno }: { onSelectAluno: (aluno: Aluno) => void }) => {
-  const { professor } = useAuth();
   const { getAlunos, loading, error } = useEmusys();
   const [alunos, setAlunos] = useState<Aluno[]>([]);
   const [filtroStatus, setFiltroStatus] = useState('ativa');
