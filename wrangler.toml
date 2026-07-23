@@ -1,14 +1,6 @@
 name = "plataforma-ia-professores"
-type = "javascript"
-account_id = ""
-workers_dev = true
-route = ""
-zone_id = ""
+pages_build_output_dir = "dist"
+main = "dist/index.html"
 
-[build]
-command = "npm run build"
-cwd = "./"
-watch_paths = ["src/**/*.ts", "src/**/*.tsx"]
-
-[build.upload]
-format = "service-worker"
+[env.production]
+name = "plataforma-ia-professores"
