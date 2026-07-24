@@ -1,6 +1,9 @@
 name = "plataforma-ia-professores"
 pages_build_output_dir = "dist"
 
+[functions]
+directory = "functions"
+
 [env.production]
 name = "plataforma-ia-professores"
 
