@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react';
 
-const EMUSYS_API_BASE = 'https://api.emusys.com.br/v1';
-const EMUSYS_TOKEN = import.meta.env.VITE_EMUSYS_TOKEN;
+const WORKER_API_BASE = 'https://painelemusys.19jorgeml.workers.dev';
 
 export const useEmusys = () => {
   const [loading, setLoading] = useState(false);
@@ -11,17 +10,14 @@ export const useEmusys = () => {
     setLoading(true);
     setError(null);
     try {
-      const url = new URL(`${EMUSYS_API_BASE}${endpoint}`);
+      const url = new URL(`${WORKER_API_BASE}${endpoint}`);
       if (params) {
         Object.entries(params).forEach(([k, v]) => {
           url.searchParams.append(k, v);
         });
       }
 
-      const response = await fetch(url.toString(), {
-        headers: { token: EMUSYS_TOKEN },
-      });
-
+      const response = await fetch(url.toString());
       if (!response.ok) {
         const errorBody = await response.text();
         throw new Error(`API error: ${response.status} - ${errorBody}`);
