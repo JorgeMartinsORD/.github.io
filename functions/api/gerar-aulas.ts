@@ -16,7 +16,7 @@ export const onRequest: PagesFunction = async (context) => {
       avaliacaoAnterior,
     } = dados;
 
-    // Pegar API Key da variável de ambiente
+    // Pegar API Key do ambiente (secret configurado no Cloudflare Pages)
     const openaiApiKey = context.env?.OPENAI_API_KEY;
     if (!openaiApiKey) {
       return new Response(
