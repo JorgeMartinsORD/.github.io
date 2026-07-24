@@ -198,6 +198,41 @@
   font-size: 1.5rem;
 }
 
+.ciclo-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.ciclo-nav h2 {
+  margin: 0;
+  min-width: 7rem;
+}
+
+.btn-ciclo {
+  background: rgba(255, 255, 255, 0.18);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 8px;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-ciclo:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.32);
+}
+
+.btn-ciclo:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .ciclo-info p {
   margin: 0;
   opacity: 0.9;

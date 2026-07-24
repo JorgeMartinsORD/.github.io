@@ -30,7 +30,7 @@ export const VisualizarAulas = ({
   cicloNumero,
   cronogramaReferencia,
 }: Props) => {
-  const { conteudo, perfil } = useSupabase();
+  const { conteudo, perfil, avaliacao } = useSupabase();
   const { gerar, loading: gerandoAulas, error: erroGeracao } = useGerarAulas();
 
   const [aulas, setAulas] = useState<AulaGerada[]>([]);
@@ -66,28 +66,35 @@ export const VisualizarAulas = ({
     }
 
     try {
+      // A partir do 2º ciclo, alimenta a IA com a avaliação do ciclo anterior
+      // para personalizar (e não repetir) o conteúdo.
+      let avaliacaoAnterior;
+      if (cicloNumero > 1) {
+        const av: any = await avaliacao.carregar(aluno.id, disciplinaId, cicloNumero - 1);
+        if (av) {
+          avaliacaoAnterior = {
+            pontosFort: av.pontos_fortes || '',
+            pontosFracos: av.pontos_fracos || '',
+          };
+        }
+      }
+
       const aulasGeradas = await gerar({
         alunoNome: aluno.nome,
-        disciplina: 'Música',
+        disciplina: cronogramaReferencia,
         objetivo: perfilAluno.objetivo,
         interesses: perfilAluno.interesses_musicais || [],
         nivel: perfilAluno.nivel,
         cronogramaReferencia,
+        avaliacaoAnterior,
       });
 
       if (aulasGeradas) {
         setAulas(aulasGeradas);
 
-        // Salvar no Supabase
+        // Salvar no Supabase (estrutura completa: titulo, conteudo, duracao, materiais)
         for (const aula of aulasGeradas) {
-          await conteudo.salvar(
-            aluno.id,
-            disciplinaId,
-            cicloNumero,
-            aula.numero,
-            aula.conteudo,
-            cronogramaReferencia
-          );
+          await conteudo.salvar(aluno.id, disciplinaId, cicloNumero, aula, cronogramaReferencia);
         }
       }
     } catch (err) {
