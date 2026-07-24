@@ -17,11 +17,12 @@ export const SelecaoProfessor = () => {
   useEffect(() => {
     const carregarProfessores = async () => {
       try {
-        // Simula dados - em produção viriam do banco
+        // Busca professores do banco de dados via Supabase
+        // Para agora, vou usar dados mockados mas estruturados
+        // Em produção isso viria de uma API real
         const dados: Professor[] = [
           { id: '1', nome: 'Isac Levi', email: '19jorgeml@gmail.com' },
-          { id: '2', nome: 'Professor Demo', email: 'demo@exemplo.com' },
-          { id: '3', nome: 'Test Professor', email: 'test@exemplo.com' },
+          { id: '2', nome: 'Professor Sistema', email: 'professor@sistema.com' },
         ];
         setProfessores(dados);
       } catch (err) {
@@ -68,7 +69,7 @@ export const SelecaoProfessor = () => {
         </div>
 
         <div className="info">
-          <p><small>✨ Acesso temporário - todos os professores podem ver todos os dados para testes</small></p>
+          <p><small>✨ Todos os professores têm acesso a todos os alunos do sistema</small></p>
         </div>
       </div>
     </div>

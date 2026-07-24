@@ -33,15 +33,9 @@ export const useEmusys = () => {
     }
   }, []);
 
-  const getProfessor = useCallback(
-    async (email: string) => {
-      return call('/professor', { email });
-    },
-    [call]
-  );
-
   const getAlunos = useCallback(
-    async (status = 'ativa') => {
+    async (status = 'todas') => {
+      // Busca TODOS os alunos, sem filtro de professor
       return call('/alunos', { status });
     },
     [call]
@@ -61,5 +55,5 @@ export const useEmusys = () => {
     [call]
   );
 
-  return { getProfessor, getAlunos, getAulas, getAulaNumero, loading, error };
+  return { getAlunos, getAulas, getAulaNumero, loading, error };
 };
