@@ -30,9 +30,9 @@ export const AvaliarAluno = ({ aluno, disciplinaId, cicloNumero, onConcluido }: 
   const carregarAvaliacaoExistente = async () => {
     const existente = await avaliacao.carregar(aluno.id, disciplinaId, cicloNumero);
     if (existente) {
-      setPontosFort(existente.pontos_fortes || '');
-      setPontosFracos(existente.pontos_fracos || '');
-      setNotasAdicionais(existente.notas_adicionais || '');
+      setPontosFort((existente as any).pontos_fortes || '');
+      setPontosFracos((existente as any).pontos_fracos || '');
+      setNotasAdicionais((existente as any).notas_adicionais || '');
       setAvaliacaoExistente(existente);
     }
   };

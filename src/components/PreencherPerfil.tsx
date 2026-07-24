@@ -47,9 +47,9 @@ export const PreencherPerfil = ({ aluno, disciplinaId, onConcluido }: Props) => 
   const carregarPerfilExistente = async () => {
     const perfilExistente = await perfil.carregar(aluno.id, disciplinaId);
     if (perfilExistente) {
-      setObjetivo(perfilExistente.objetivo || '');
-      setInteresses(perfilExistente.interesses_musicais || []);
-      setNivel(perfilExistente.nivel || 'Intermediário');
+      setObjetivo((perfilExistente as any).objetivo || '');
+      setInteresses((perfilExistente as any).interesses_musicais || []);
+      setNivel((perfilExistente as any).nivel || 'Intermediário');
     }
   };
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useEmusys } from '../hooks/useEmusys';
 import { PreencherPerfil } from './PreencherPerfil';
 import { VisualizarAulas } from './VisualizarAulas';
@@ -22,7 +22,7 @@ interface Props {
 type Tela = 'resumo' | 'preencher-perfil' | 'visualizar-aulas' | 'avaliar';
 
 export const TelaAluno = ({ aluno, onVoltar }: Props) => {
-  const { loading } = useEmusys();
+  useEmusys();
   const [disciplinaSelecionada, setDisciplinaSelecionada] = useState<any | null>(
     aluno.disciplinas?.[0] || null
   );

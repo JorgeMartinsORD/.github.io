@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { createClient } from '@supabase/supabase-js';
-import { Database } from '../types/database';
+import type { Database } from '../types/database';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -25,7 +25,7 @@ export const useSupabase = () => {
             objetivo,
             interesses_musicais: interesses,
             nivel,
-          });
+          } as any);
         if (err) throw err;
         return true;
       } catch (err) {
@@ -83,7 +83,7 @@ export const useSupabase = () => {
             conteudo,
             cronograma_referencia: cronogramaReferencia,
             criado_por_ia: true,
-          });
+          } as any);
         if (err) throw err;
         return true;
       } catch (err) {
@@ -145,7 +145,7 @@ export const useSupabase = () => {
             pontos_fortes: pontosFort,
             pontos_fracos: pontosFracos,
             notas_adicionais: notasAdicionais,
-          });
+          } as any);
         if (err) throw err;
         return true;
       } catch (err) {
@@ -208,7 +208,7 @@ export const useSupabase = () => {
             video_url: videoUrl,
             duracao_segundos: duracaoSegundos,
             notas_professor: notasProfessor,
-          });
+          } as any);
         if (err) throw err;
         return true;
       } catch (err) {
@@ -270,7 +270,7 @@ export const useSupabase = () => {
             descricao,
             motivo,
             aplicado_na_aula: aplicadoNaAula,
-          });
+          } as any);
         if (err) throw err;
         return true;
       } catch (err) {
