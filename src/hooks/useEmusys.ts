@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 
-const WORKER_API_BASE = 'https://painelemusys.19jorgeml.workers.dev';
+const WORKER_API_BASE = 'https://calm-night-3061.19jorgeml.workers.dev';
 
 export const useEmusys = () => {
   const [loading, setLoading] = useState(false);
@@ -54,8 +54,8 @@ export const useEmusys = () => {
   const getAulas = useCallback(
     async (dataInicial: string, dataFinal: string) => {
       return call('/aulas', {
-        data_hora_inicial: `${dataInicial}T00:00:00`,
-        data_hora_final: `${dataFinal}T23:59:59`,
+        data_inicial: dataInicial,
+        data_final: dataFinal,
       });
     },
     [call]
