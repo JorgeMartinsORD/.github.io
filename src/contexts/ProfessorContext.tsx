@@ -1,9 +1,9 @@
 import { createContext, useContext, useState, type ReactNode } from 'react';
 
 interface Professor {
-  id: string;
+  id: number;
   nome: string;
-  email: string;
+  email?: string;
 }
 
 interface ProfessorContextType {

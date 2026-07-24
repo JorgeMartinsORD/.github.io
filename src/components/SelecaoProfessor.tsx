@@ -1,15 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useProfessor } from '../contexts/ProfessorContext';
+import { useEmusys } from '../hooks/useEmusys';
 import './SelecaoProfessor.css';
 
 interface Professor {
-  id: string;
+  id: number;
   nome: string;
-  email: string;
 }
 
 export const SelecaoProfessor = () => {
   const { setProfessor } = useProfessor();
+  const { getProfessores } = useEmusys();
   const [professores, setProfessores] = useState<Professor[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -17,13 +18,9 @@ export const SelecaoProfessor = () => {
   useEffect(() => {
     const carregarProfessores = async () => {
       try {
-        // Busca professores do banco de dados via Supabase
-        // Para agora, vou usar dados mockados mas estruturados
-        // Em produção isso viria de uma API real
-        const dados: Professor[] = [
-          { id: '1', nome: 'Isac Levi', email: '19jorgeml@gmail.com' },
-          { id: '2', nome: 'Professor Sistema', email: 'professor@sistema.com' },
-        ];
+        const dados = await getProfessores();
+        // Ordena alfabeticamente por nome
+        dados.sort((a, b) => a.nome.trim().localeCompare(b.nome.trim(), 'pt-BR'));
         setProfessores(dados);
       } catch (err) {
         setError('Erro ao carregar professores');
@@ -34,7 +31,7 @@ export const SelecaoProfessor = () => {
     };
 
     carregarProfessores();
-  }, []);
+  }, [getProfessores]);
 
   const handleSelecionar = (professor: Professor) => {
     setProfessor(professor);
@@ -61,15 +58,14 @@ export const SelecaoProfessor = () => {
               onClick={() => handleSelecionar(prof)}
             >
               <div className="professor-avatar">👨‍🏫</div>
-              <h3>{prof.nome}</h3>
-              <p>{prof.email}</p>
+              <h3>{prof.nome.trim()}</h3>
               <span className="btn-text">Acessar →</span>
             </button>
           ))}
         </div>
 
         <div className="info">
-          <p><small>✨ Todos os professores têm acesso a todos os alunos do sistema</small></p>
+          <p><small>✨ Cada professor vê apenas seus próprios alunos, organizados por dia e turma</small></p>
         </div>
       </div>
     </div>

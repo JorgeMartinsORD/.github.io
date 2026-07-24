@@ -131,3 +131,186 @@
   margin: 0.5rem 0;
   font-size: 0.9rem;
 }
+
+/* ===== Visão agrupada: Dia → Turma → Alunos ===== */
+
+.lista-header > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.lista-sub {
+  margin: 0;
+  color: #667eea;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.error-message {
+  color: #c33;
+  background: #fee;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+.error-message p {
+  margin: 0;
+}
+
+.dias-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.dia-bloco {
+  background: #f8f9ff;
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem 1.5rem;
+}
+
+.dia-titulo {
+  margin: 0 0 1rem 0;
+  color: #333;
+  font-size: 1.35rem;
+  border-bottom: 2px solid #667eea;
+  padding-bottom: 0.5rem;
+}
+
+.turmas-lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.25rem;
+}
+
+.turma-card {
+  background: white;
+  border: 1px solid #e2e4f0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.turma-card.grupo {
+  border-top: 4px solid #667eea;
+}
+
+.turma-card.individual {
+  border-top: 4px solid #38b48b;
+}
+
+.turma-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: #fafbff;
+  border-bottom: 1px solid #eef0f8;
+  flex-wrap: wrap;
+}
+
+.turma-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #667eea;
+}
+
+.turma-card.individual .turma-badge {
+  color: #2e9c78;
+}
+
+.turma-label {
+  font-weight: 700;
+  color: #333;
+  flex: 1;
+  min-width: 0;
+}
+
+.turma-horario {
+  font-size: 0.85rem;
+  color: #666;
+  background: #eef0f8;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+}
+
+.turma-count {
+  min-width: 1.5rem;
+  height: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #667eea;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0 0.4rem;
+}
+
+.turma-card.individual .turma-count {
+  background: #38b48b;
+}
+
+.alunos-turma {
+  list-style: none;
+  margin: 0;
+  padding: 0.25rem 0;
+}
+
+.aluno-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 1rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  border-bottom: 1px solid #f2f3fa;
+}
+
+.aluno-item:last-child {
+  border-bottom: none;
+}
+
+.aluno-item:hover {
+  background: #f2f4ff;
+}
+
+.aluno-nome {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.aluno-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.aluno-horario {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #667eea;
+}
+
+.aluno-disc {
+  font-size: 0.78rem;
+  color: #777;
+}
+
+.aluno-sala {
+  font-size: 0.72rem;
+  color: #999;
+  background: #f0f1f7;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+}

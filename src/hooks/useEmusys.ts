@@ -17,6 +17,7 @@ export const useEmusys = () => {
         });
       }
 
+      console.log('[useEmusys] Calling:', url.toString());
       const response = await fetch(url.toString());
       if (!response.ok) {
         const errorBody = await response.text();
@@ -36,7 +37,7 @@ export const useEmusys = () => {
 
   const getAlunos = useCallback(
     async (status = 'todas') => {
-      const data = await call('/matriculas', { status });
+      const data = await call('/api/matriculas', { status });
       // Mapeia matrículas para formato de alunos esperado pelo frontend
       const alunos = data.items?.map((m: any) => ({
         id: m.aluno?.id,
@@ -53,7 +54,7 @@ export const useEmusys = () => {
 
   const getAulas = useCallback(
     async (dataInicial: string, dataFinal: string) => {
-      return call('/aulas', {
+      return call('/api/aulas', {
         data_inicial: dataInicial,
         data_final: dataFinal,
       });
@@ -63,12 +64,17 @@ export const useEmusys = () => {
 
   const getAulaNumero = useCallback(
     async (alunoId: string) => {
-      const matriculas = await call('/matriculas', { aluno_id: alunoId });
+      const matriculas = await call('/api/matriculas', { aluno_id: alunoId });
       const nrAulasPassadas = matriculas.items?.[0]?.contrato_atual?.disciplinas?.[0]?.nr_aulas_passadas || 0;
       return { aluno_id: alunoId, aula_numero: nrAulasPassadas + 1, aulas_passadas: nrAulasPassadas };
     },
     [call]
   );
 
-  return { getAlunos, getAulas, getAulaNumero, loading, error };
+  const getProfessores = useCallback(async () => {
+    const data = await call('/api/professores');
+    return (data.professores || []) as Array<{ id: number; nome: string }>;
+  }, [call]);
+
+  return { getAlunos, getAulas, getAulaNumero, getProfessores, loading, error };
 };
