@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 
-const EMUSYS_API_BASE = '/api';
+const EMUSYS_API_BASE = 'https://api.emusys.com.br/v1';
+const EMUSYS_TOKEN = import.meta.env.VITE_EMUSYS_TOKEN;
 
 export const useEmusys = () => {
   const [loading, setLoading] = useState(false);
@@ -10,16 +11,20 @@ export const useEmusys = () => {
     setLoading(true);
     setError(null);
     try {
-      const url = new URL(`${EMUSYS_API_BASE}${endpoint}`, window.location.origin);
+      const url = new URL(`${EMUSYS_API_BASE}${endpoint}`);
       if (params) {
         Object.entries(params).forEach(([k, v]) => {
           url.searchParams.append(k, v);
         });
       }
 
-      const response = await fetch(url.toString());
+      const response = await fetch(url.toString(), {
+        headers: { token: EMUSYS_TOKEN },
+      });
+
       if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
+        const errorBody = await response.text();
+        throw new Error(`API error: ${response.status} - ${errorBody}`);
       }
 
       const data = await response.json();
@@ -35,22 +40,26 @@ export const useEmusys = () => {
 
   const getAlunos = useCallback(
     async (status = 'todas') => {
-      // Busca TODOS os alunos, sem filtro de professor
-      return call('/alunos', { status });
+      return call('/matriculas', { status });
     },
     [call]
   );
 
   const getAulas = useCallback(
     async (dataInicial: string, dataFinal: string) => {
-      return call('/aulas', { data_inicial: dataInicial, data_final: dataFinal });
+      return call('/aulas', {
+        data_hora_inicial: `${dataInicial}T00:00:00`,
+        data_hora_final: `${dataFinal}T23:59:59`,
+      });
     },
     [call]
   );
 
   const getAulaNumero = useCallback(
     async (alunoId: string) => {
-      return call('/aula-numero', { aluno_id: alunoId });
+      const matriculas = await call('/matriculas', { aluno_id: alunoId });
+      const nrAulasPassadas = matriculas.items?.[0]?.contrato_atual?.disciplinas?.[0]?.nr_aulas_passadas || 0;
+      return { aluno_id: alunoId, aula_numero: nrAulasPassadas + 1, aulas_passadas: nrAulasPassadas };
     },
     [call]
   );
