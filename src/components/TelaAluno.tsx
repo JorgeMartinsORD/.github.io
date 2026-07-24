@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useEmusys } from '../hooks/useEmusys';
+import { PreencherPerfil } from './PreencherPerfil';
+import { VisualizarAulas } from './VisualizarAulas';
+import { AvaliarAluno } from './AvaliarAluno';
 import './TelaAluno.css';
 
 interface Aluno {
@@ -16,23 +19,92 @@ interface Props {
   onVoltar: () => void;
 }
 
+type Tela = 'resumo' | 'preencher-perfil' | 'visualizar-aulas' | 'avaliar';
+
 export const TelaAluno = ({ aluno, onVoltar }: Props) => {
-  const { getAulaNumero, loading } = useEmusys();
-  const [aulaNumero, setAulaNumero] = useState<{ aula_numero: number; aulas_passadas: number } | null>(null);
+  const { loading } = useEmusys();
+  const [disciplinaSelecionada, setDisciplinaSelecionada] = useState<any | null>(
+    aluno.disciplinas?.[0] || null
+  );
+  const [cicloNumero, setCicloNumero] = useState(1);
+  const [telaAtual, setTelaAtual] = useState<Tela>('resumo');
 
-  useEffect(() => {
-    const carregar = async () => {
-      try {
-        const data = await getAulaNumero(aluno.id);
-        setAulaNumero(data);
-      } catch (err) {
-        console.error('Erro ao carregar número da aula:', err);
-      }
-    };
+  const disciplinaId = disciplinaSelecionada?.id ? parseInt(String(disciplinaSelecionada.id)) : 0;
 
-    carregar();
-  }, [aluno.id, getAulaNumero]);
+  const handleProximoEtapa = () => {
+    if (telaAtual === 'preencher-perfil') {
+      setTelaAtual('visualizar-aulas');
+    } else if (telaAtual === 'visualizar-aulas') {
+      setTelaAtual('avaliar');
+    } else if (telaAtual === 'avaliar') {
+      setCicloNumero((prev) => prev + 1);
+      setTelaAtual('visualizar-aulas');
+    }
+  };
 
+  if (!disciplinaSelecionada) {
+    return (
+      <div className="tela-aluno">
+        <button className="btn-voltar" onClick={onVoltar}>← Voltar</button>
+        <p>Selecione uma disciplina</p>
+      </div>
+    );
+  }
+
+  // Renderizar componentes baseado na tela
+  if (telaAtual === 'preencher-perfil') {
+    return (
+      <div className="tela-aluno">
+        <button className="btn-voltar" onClick={() => setTelaAtual('resumo')}>
+          ← Voltar
+        </button>
+        <PreencherPerfil
+          aluno={{ id: parseInt(String(aluno.id)), nome: aluno.nome }}
+          disciplinaId={disciplinaId}
+          onConcluido={handleProximoEtapa}
+        />
+      </div>
+    );
+  }
+
+  if (telaAtual === 'visualizar-aulas') {
+    return (
+      <div className="tela-aluno">
+        <button className="btn-voltar" onClick={() => setTelaAtual('resumo')}>
+          ← Voltar
+        </button>
+        <VisualizarAulas
+          aluno={{ id: parseInt(String(aluno.id)), nome: aluno.nome }}
+          disciplinaId={disciplinaId}
+          cicloNumero={cicloNumero}
+          cronogramaReferencia={disciplinaSelecionada.nome || 'Cronograma'}
+        />
+        <div className="acoes-ciclo">
+          <button className="btn-proximo" onClick={() => setTelaAtual('avaliar')}>
+            Ir para Avaliação →
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (telaAtual === 'avaliar') {
+    return (
+      <div className="tela-aluno">
+        <button className="btn-voltar" onClick={() => setTelaAtual('resumo')}>
+          ← Voltar
+        </button>
+        <AvaliarAluno
+          aluno={{ id: parseInt(String(aluno.id)), nome: aluno.nome }}
+          disciplinaId={disciplinaId}
+          cicloNumero={cicloNumero}
+          onConcluido={handleProximoEtapa}
+        />
+      </div>
+    );
+  }
+
+  // Tela de resumo (padrão)
   return (
     <div className="tela-aluno">
       <button className="btn-voltar" onClick={onVoltar}>← Voltar</button>
@@ -61,43 +133,54 @@ export const TelaAluno = ({ aluno, onVoltar }: Props) => {
         </div>
       </div>
 
-      <div className="aula-numero-card">
-        <h2>🎵 Aula Atual</h2>
-        {loading ? (
-          <p>Carregando...</p>
-        ) : aulaNumero ? (
-          <>
-            <div className="aula-numero-grande">
-              Aula <span>{aulaNumero.aula_numero}</span>
-            </div>
-            <p className="aula-passadas">
-              {aulaNumero.aulas_passadas} aula(s) já realizada(s)
-            </p>
-          </>
-        ) : (
-          <p>Sem informações de aulas</p>
-        )}
-      </div>
-
-      <div className="disciplinas">
-        <h3>Disciplinas Cadastradas</h3>
-        {aluno.disciplinas.length > 0 ? (
-          <div className="disciplinas-list">
-            {aluno.disciplinas.map((disc: any, i: number) => (
-              <div key={i} className="disciplina-item">
-                <h4>{disc.nome}</h4>
-                <p>Tipo: {disc.tipo}</p>
-                <p>Professor: {disc.nome_professor || 'Não atribuído'}</p>
-              </div>
+      {aluno.disciplinas.length > 1 && (
+        <div className="disciplina-seletor">
+          <label>Selecione a disciplina:</label>
+          <select
+            value={disciplinaId}
+            onChange={(e) => {
+              const disc = aluno.disciplinas.find(
+                (d: any) => d.id === parseInt(e.target.value)
+              );
+              setDisciplinaSelecionada(disc);
+              setCicloNumero(1);
+            }}
+          >
+            {aluno.disciplinas.map((disc: any) => (
+              <option key={disc.id} value={disc.id}>
+                {disc.nome}
+              </option>
             ))}
-          </div>
-        ) : (
-          <p>Sem disciplinas cadastradas</p>
-        )}
+          </select>
+        </div>
+      )}
+
+      <div className="ciclo-info">
+        <h2>🎯 Ciclo Atual: {cicloNumero}</h2>
+        <p>Gerenciar aulas e feedback do aluno nesta disciplina</p>
       </div>
 
-      <div className="btn-group">
-        <button className="btn-gerar-plano">Gerar Plano do Mês →</button>
+      <div className="acoes-principais">
+        <button
+          className="btn-acao btn-perfil"
+          onClick={() => setTelaAtual('preencher-perfil')}
+        >
+          <span className="emoji">👤</span>
+          <span>Preencher Perfil</span>
+          <span className="desc">Aula 1</span>
+        </button>
+
+        <button className="btn-acao btn-aulas" onClick={() => setTelaAtual('visualizar-aulas')}>
+          <span className="emoji">📚</span>
+          <span>Ver Aulas</span>
+          <span className="desc">Aulas 1-3</span>
+        </button>
+
+        <button className="btn-acao btn-avaliar" onClick={() => setTelaAtual('avaliar')}>
+          <span className="emoji">🎯</span>
+          <span>Avaliar Aluno</span>
+          <span className="desc">Aula 4</span>
+        </button>
       </div>
     </div>
   );
