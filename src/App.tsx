@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { Login } from './components/Login';
+import { ProfessorProvider, useProfessor } from './contexts/ProfessorContext';
+import { SelecaoProfessor } from './components/SelecaoProfessor';
 import { ListaAlunos } from './components/ListaAlunos';
 import { TelaAluno } from './components/TelaAluno';
 import './App.css';
@@ -15,31 +15,19 @@ interface Aluno {
 }
 
 const AppContent = () => {
-  const { professor, loading, logout } = useAuth();
+  const { professorSelecionado, logout } = useProfessor();
   const [telaAtual, setTelaAtual] = useState<'lista' | 'detalhe'>('lista');
   const [alunoSelecionado, setAlunoSelecionado] = useState<Aluno | null>(null);
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      setTelaAtual('lista');
-      setAlunoSelecionado(null);
-    } catch (err) {
-      console.error('Erro ao fazer logout:', err);
-    }
+  const handleLogout = () => {
+    logout();
+    setTelaAtual('lista');
+    setAlunoSelecionado(null);
   };
 
-  if (loading) {
-    return (
-      <div className="loading-container">
-        <div className="spinner"></div>
-        <p>Carregando...</p>
-      </div>
-    );
-  }
-
-  if (!professor) {
-    return <Login />;
+  // Se nenhum professor selecionado, mostra tela de seleção
+  if (!professorSelecionado) {
+    return <SelecaoProfessor />;
   }
 
   return (
@@ -47,9 +35,9 @@ const AppContent = () => {
       <header className="dashboard-header">
         <h1>🎵 Plataforma IA Professores</h1>
         <div className="professor-info">
-          <p>{professor.nome || professor.email}</p>
+          <p>{professorSelecionado.nome}</p>
           <button onClick={handleLogout} className="btn-logout">
-            Sair
+            Trocar Professor
           </button>
         </div>
       </header>
@@ -77,9 +65,9 @@ const AppContent = () => {
 
 function App() {
   return (
-    <AuthProvider>
+    <ProfessorProvider>
       <AppContent />
-    </AuthProvider>
+    </ProfessorProvider>
   );
 }
 

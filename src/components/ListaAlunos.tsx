@@ -24,9 +24,8 @@ export const ListaAlunos = ({ onSelectAluno }: { onSelectAluno: (aluno: Aluno) =
         const data = await getAlunos(filtroStatus);
         setAlunos(data.items || []);
       } catch (err) {
-        // Se der erro (ex: sem alunos vinculados), mostra mensagem amigável
         console.error('Erro ao carregar alunos:', err);
-        setLocalError('Nenhum aluno encontrado com este filtro. Isto é normal se seu email não tem alunos no Emusys.');
+        setLocalError('Nenhum aluno encontrado. Todos os professores têm acesso a todos os dados.');
         setAlunos([]);
       }
     };
@@ -37,7 +36,7 @@ export const ListaAlunos = ({ onSelectAluno }: { onSelectAluno: (aluno: Aluno) =
   return (
     <div className="lista-alunos">
       <header className="lista-header">
-        <h2>📚 Alunos</h2>
+        <h2>📚 Alunos do Sistema</h2>
         <select 
           value={filtroStatus} 
           onChange={(e) => setFiltroStatus(e.target.value)}
@@ -55,15 +54,6 @@ export const ListaAlunos = ({ onSelectAluno }: { onSelectAluno: (aluno: Aluno) =
       {(error || localError) && (
         <div className="error-message">
           <p>⚠️ {error || localError}</p>
-          <details className="debug-info">
-            <summary>Dicas</summary>
-            <ul>
-              <li>Seu email deve estar cadastrado como professor no Emusys</li>
-              <li>Verifique se tem alunos vinculados a você</li>
-              <li>Tente trocar o filtro (Todas, Finalizadas, etc)</li>
-              <li>Se nenhum aluno aparecer, é porque não há matrícula ativa com esse email</li>
-            </ul>
-          </details>
         </div>
       )}
 
