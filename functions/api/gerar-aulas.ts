@@ -14,14 +14,14 @@ export const onRequest: PagesFunction = async (context) => {
       nivel,
       cronogramaReferencia,
       avaliacaoAnterior,
-      openaiApiKey,
     } = dados;
 
-    // Validar campos obrigatórios
+    // Pegar API Key da variável de ambiente
+    const openaiApiKey = context.env?.OPENAI_API_KEY;
     if (!openaiApiKey) {
       return new Response(
-        JSON.stringify({ sucesso: false, erro: 'API Key do OpenAI é obrigatória' }),
-        { status: 400 }
+        JSON.stringify({ sucesso: false, erro: 'API Key do OpenAI não configurada no servidor' }),
+        { status: 500 }
       );
     }
 

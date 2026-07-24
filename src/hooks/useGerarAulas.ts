@@ -11,7 +11,6 @@ interface DadosGeracaoAulas {
     pontosFort: string;
     pontosFracos: string;
   };
-  openaiApiKey: string;
 }
 
 interface AulaGerada {
