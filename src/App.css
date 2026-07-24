@@ -80,3 +80,30 @@
   padding: 0.5rem 0;
   color: #666;
 }
+
+.professor-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.professor-info p {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.btn-logout {
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-logout:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: white;
+}

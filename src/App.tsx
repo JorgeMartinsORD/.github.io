@@ -15,9 +15,19 @@ interface Aluno {
 }
 
 const AppContent = () => {
-  const { professor, loading } = useAuth();
+  const { professor, loading, logout } = useAuth();
   const [telaAtual, setTelaAtual] = useState<'lista' | 'detalhe'>('lista');
   const [alunoSelecionado, setAlunoSelecionado] = useState<Aluno | null>(null);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setTelaAtual('lista');
+      setAlunoSelecionado(null);
+    } catch (err) {
+      console.error('Erro ao fazer logout:', err);
+    }
+  };
 
   if (loading) {
     return (
@@ -38,6 +48,9 @@ const AppContent = () => {
         <h1>🎵 Plataforma IA Professores</h1>
         <div className="professor-info">
           <p>{professor.nome || professor.email}</p>
+          <button onClick={handleLogout} className="btn-logout">
+            Sair
+          </button>
         </div>
       </header>
 
