@@ -36,7 +36,17 @@ export const useEmusys = () => {
 
   const getAlunos = useCallback(
     async (status = 'todas') => {
-      return call('/matriculas', { status });
+      const data = await call('/matriculas', { status });
+      // Mapeia matrículas para formato de alunos esperado pelo frontend
+      const alunos = data.items?.map((m: any) => ({
+        id: m.aluno?.id,
+        nome: m.aluno?.nome,
+        email: m.aluno?.email,
+        telefone: m.aluno?.telefone,
+        data_nascimento: m.aluno?.data_nascimento,
+        disciplinas: m.contrato_atual?.disciplinas || [],
+      })) || [];
+      return { items: alunos };
     },
     [call]
   );
