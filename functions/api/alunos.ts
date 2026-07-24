@@ -44,12 +44,13 @@ async function fetchEmusysWithPagination(
 export const onRequest: PagesFunction = async (context) => {
   try {
     const token = context.env?.EMUSYS_TOKEN;
+    console.log("[DEBUG] Token available:", !!token);
 
     if (!token) {
       return new Response(
         JSON.stringify({
-          error: "EMUSYS_TOKEN not configured in Cloudflare environment",
-          hint: "Run: wrangler secret put EMUSYS_TOKEN",
+          error: "EMUSYS_TOKEN not configured",
+          debug: "no token in env",
         }),
         { status: 500, headers: { "Content-Type": "application/json" } }
       );
@@ -57,28 +58,33 @@ export const onRequest: PagesFunction = async (context) => {
 
     const url = new URL(context.request.url);
     const status = url.searchParams.get("status") || "ativa";
+    console.log("[DEBUG] Fetching matriculas with status:", status);
 
     const matriculas = await fetchEmusysWithPagination(token, "/matriculas", {
       status: status,
     });
 
+    console.log("[DEBUG] Got matriculas:", matriculas.length);
+
     const alunos = matriculas.map((m) => ({
-      id: m.aluno.id,
-      nome: m.aluno.nome,
-      email: m.aluno.email,
-      telefone: m.aluno.telefone,
-      data_nascimento: m.aluno.data_nascimento,
+      id: m.aluno?.id,
+      nome: m.aluno?.nome,
+      email: m.aluno?.email,
+      telefone: m.aluno?.telefone,
+      data_nascimento: m.aluno?.data_nascimento,
       disciplinas: m.contrato_atual?.disciplinas || [],
       status: m.status,
     }));
 
+    console.log("[DEBUG] Returning alunos:", alunos.length);
     return new Response(JSON.stringify({ items: alunos }), {
       headers: { "Content-Type": "application/json" },
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
+    console.error("[ERROR]", message, err);
     return new Response(
-      JSON.stringify({ error: message }),
+      JSON.stringify({ error: message, debug: String(err) }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
