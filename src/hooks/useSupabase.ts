@@ -73,7 +73,8 @@ export const useSupabase = () => {
       disciplinaId: number,
       cicloNumero: number,
       aula: { numero: number; titulo?: string; conteudo: string; duracao?: string; materiais?: string[] },
-      cronogramaReferencia?: string
+      cronogramaReferencia?: string,
+      criadoPorIa: boolean = true
     ) => {
       setLoading(true);
       setError(null);
@@ -94,7 +95,7 @@ export const useSupabase = () => {
               aula_numero: aula.numero,
               conteudo: payload,
               cronograma_referencia: cronogramaReferencia,
-              criado_por_ia: true,
+              criado_por_ia: criadoPorIa,
             } as any,
             { onConflict: 'aluno_id,disciplina_id,ciclo_numero,aula_numero' }
           );
@@ -139,6 +140,7 @@ export const useSupabase = () => {
             conteudo: parsed?.conteudo ?? row.conteudo,
             duracao: parsed?.duracao || '',
             materiais: parsed?.materiais || [],
+            criadoPorIa: row.criado_por_ia !== false,
           };
         });
       } catch (err) {

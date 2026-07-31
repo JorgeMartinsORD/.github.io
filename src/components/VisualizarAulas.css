@@ -230,3 +230,123 @@
   color: #6b7280;
   text-align: center;
 }
+
+.alerta.sucesso {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #86efac;
+}
+
+/* ===== Edição inline da aula ===== */
+
+.badge-editado {
+  display: inline-block;
+  margin-left: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #185a9d;
+  background: #d1fae5;
+  border: 1px solid #a7f3d0;
+  padding: 2px 8px;
+  border-radius: 999px;
+  vertical-align: middle;
+}
+
+.btn-editar-aula {
+  margin-top: 14px;
+  padding: 9px 16px;
+  background: #fff;
+  color: #185a9d;
+  border: 1px solid #43cea2;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-editar-aula:hover {
+  background: #ecfdf5;
+  box-shadow: 0 2px 8px rgba(24, 90, 157, 0.15);
+}
+
+.aula-edicao {
+  display: flex;
+  flex-direction: column;
+}
+
+.edit-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  margin: 12px 0 4px;
+}
+
+.edit-input,
+.edit-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  color: #1f2937;
+  transition: border-color 0.2s;
+}
+
+.edit-textarea {
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.edit-input:focus,
+.edit-textarea:focus {
+  outline: none;
+  border-color: #43cea2;
+  box-shadow: 0 0 0 3px rgba(67, 206, 162, 0.15);
+}
+
+.edit-acoes {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.btn-salvar-edicao {
+  flex: 1;
+  padding: 11px 18px;
+  background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-salvar-edicao:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(24, 90, 157, 0.3);
+}
+
+.btn-salvar-edicao:disabled,
+.btn-cancelar-edicao:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-cancelar-edicao {
+  padding: 11px 18px;
+  background: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-cancelar-edicao:hover:not(:disabled) {
+  background: #e5e7eb;
+}

@@ -5,7 +5,6 @@ import { PreencherPerfil } from './PreencherPerfil';
 import { VisualizarAulas } from './VisualizarAulas';
 import { AvaliarAluno } from './AvaliarAluno';
 import { GravarAula } from './GravarAula';
-import { AjustarAula } from './AjustarAula';
 import './TelaAluno.css';
 
 interface Aluno {
@@ -22,7 +21,7 @@ interface Props {
   onVoltar: () => void;
 }
 
-type Tela = 'resumo' | 'preencher-perfil' | 'visualizar-aulas' | 'avaliar' | 'gravacoes' | 'ajustes';
+type Tela = 'resumo' | 'preencher-perfil' | 'visualizar-aulas' | 'avaliar' | 'gravacoes';
 
 export const TelaAluno = ({ aluno, onVoltar }: Props) => {
   useEmusys();
@@ -138,21 +137,6 @@ export const TelaAluno = ({ aluno, onVoltar }: Props) => {
     );
   }
 
-  if (telaAtual === 'ajustes') {
-    return (
-      <div className="tela-aluno">
-        <button className="btn-voltar" onClick={() => setTelaAtual('resumo')}>
-          ← Voltar
-        </button>
-        <AjustarAula
-          aluno={{ id: alunoIdNum, nome: aluno.nome }}
-          disciplinaId={disciplinaId}
-          cicloNumero={cicloNumero}
-        />
-      </div>
-    );
-  }
-
   // Tela de resumo (padrão)
   return (
     <div className="tela-aluno">
@@ -249,12 +233,6 @@ export const TelaAluno = ({ aluno, onVoltar }: Props) => {
           <span className="emoji">🎥</span>
           <span>Gravações</span>
           <span className="desc">Vídeos das aulas</span>
-        </button>
-
-        <button className="btn-acao btn-ajustes" onClick={() => setTelaAtual('ajustes')}>
-          <span className="emoji">✏️</span>
-          <span>Ajustes no Plano</span>
-          <span className="desc">Editar planejamento</span>
         </button>
       </div>
     </div>

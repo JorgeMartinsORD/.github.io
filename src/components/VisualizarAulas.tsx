@@ -22,6 +22,7 @@ interface AulaGerada {
   conteudo: string;
   duracao: string;
   materiais?: string[];
+  criadoPorIa?: boolean;
 }
 
 export const VisualizarAulas = ({
@@ -37,6 +38,10 @@ export const VisualizarAulas = ({
   const [carregando, setCarregando] = useState(true);
   const [expandidas, setExpandidas] = useState<number[]>([]);
   const [perfilAluno, setPerfilAluno] = useState<any>(null);
+  const [editando, setEditando] = useState<number | null>(null);
+  const [rascunho, setRascunho] = useState<AulaGerada | null>(null);
+  const [salvandoEdicao, setSalvandoEdicao] = useState(false);
+  const [msgEdicao, setMsgEdicao] = useState('');
 
   useEffect(() => {
     carregarDados();
@@ -103,9 +108,49 @@ export const VisualizarAulas = ({
   };
 
   const toggleExpandir = (numero: number) => {
+    if (editando === numero) return; // não recolhe enquanto edita
     setExpandidas((prev) =>
       prev.includes(numero) ? prev.filter((n) => n !== numero) : [...prev, numero]
     );
+  };
+
+  const iniciarEdicao = (aula: AulaGerada) => {
+    setEditando(aula.numero);
+    setRascunho({ ...aula, materiais: aula.materiais || [] });
+    setExpandidas((prev) => (prev.includes(aula.numero) ? prev : [...prev, aula.numero]));
+  };
+
+  const cancelarEdicao = () => {
+    setEditando(null);
+    setRascunho(null);
+  };
+
+  const atualizarRascunho = (campo: keyof AulaGerada, valor: any) => {
+    setRascunho((prev) => (prev ? { ...prev, [campo]: valor } : prev));
+  };
+
+  const salvarEdicao = async () => {
+    if (!rascunho) return;
+    if (!rascunho.conteudo.trim()) {
+      alert('O conteúdo da aula não pode ficar vazio.');
+      return;
+    }
+    setSalvandoEdicao(true);
+    try {
+      // criadoPorIa = false marca que o professor editou (acompanhamento do que foi dado)
+      await conteudo.salvar(aluno.id, disciplinaId, cicloNumero, rascunho, cronogramaReferencia, false);
+      setAulas((prev) =>
+        prev.map((a) => (a.numero === rascunho.numero ? { ...rascunho, criadoPorIa: false } : a))
+      );
+      setEditando(null);
+      setRascunho(null);
+      setMsgEdicao('✅ Aula atualizada!');
+      setTimeout(() => setMsgEdicao(''), 2500);
+    } catch (err) {
+      console.error('Erro ao salvar edição da aula:', err);
+    } finally {
+      setSalvandoEdicao(false);
+    }
   };
 
   return (
@@ -126,6 +171,7 @@ export const VisualizarAulas = ({
         </header>
 
         {erroGeracao && <div className="alerta erro">❌ {erroGeracao}</div>}
+        {msgEdicao && <div className="alerta sucesso">{msgEdicao}</div>}
 
         {carregando && <div className="loading">Carregando aulas...</div>}
 
@@ -148,8 +194,13 @@ export const VisualizarAulas = ({
                     <span className="numero-circulo">{aula.numero}</span>
                   </div>
                   <div className="aula-resumo">
-                    <h3>{aula.titulo}</h3>
-                    <p className="duracao">⏱️ {aula.duracao}</p>
+                    <h3>
+                      {aula.titulo}
+                      {aula.criadoPorIa === false && (
+                        <span className="badge-editado">✏️ Editado pelo professor</span>
+                      )}
+                    </h3>
+                    <p className="duracao">⏱️ {aula.duracao || 'Sem duração'}</p>
                   </div>
                   <div className="chevron">
                     {expandidas.includes(aula.numero) ? '▼' : '▶'}
@@ -158,20 +209,86 @@ export const VisualizarAulas = ({
 
                 {expandidas.includes(aula.numero) && (
                   <div className="aula-conteudo-expandido">
-                    <div className="conteudo-texto">
-                      <h4>Conteúdo</h4>
-                      <p>{aula.conteudo}</p>
-                    </div>
+                    {editando === aula.numero && rascunho ? (
+                      /* MODO EDIÇÃO */
+                      <div className="aula-edicao">
+                        <label className="edit-label">Título</label>
+                        <input
+                          className="edit-input"
+                          value={rascunho.titulo}
+                          onChange={(e) => atualizarRascunho('titulo', e.target.value)}
+                        />
 
-                    {aula.materiais && aula.materiais.length > 0 && (
-                      <div className="materiais">
-                        <h4>📋 Materiais</h4>
-                        <ul>
-                          {aula.materiais.map((material, idx) => (
-                            <li key={idx}>{material}</li>
-                          ))}
-                        </ul>
+                        <label className="edit-label">Duração</label>
+                        <input
+                          className="edit-input"
+                          value={rascunho.duracao}
+                          placeholder="Ex: 50 minutos"
+                          onChange={(e) => atualizarRascunho('duracao', e.target.value)}
+                        />
+
+                        <label className="edit-label">Conteúdo / o que foi dado</label>
+                        <textarea
+                          className="edit-textarea"
+                          rows={6}
+                          value={rascunho.conteudo}
+                          onChange={(e) => atualizarRascunho('conteudo', e.target.value)}
+                        />
+
+                        <label className="edit-label">Materiais (um por linha)</label>
+                        <textarea
+                          className="edit-textarea"
+                          rows={3}
+                          value={(rascunho.materiais || []).join('\n')}
+                          placeholder={'Ex: Metrônomo\nPartitura da música X'}
+                          onChange={(e) =>
+                            atualizarRascunho(
+                              'materiais',
+                              e.target.value.split('\n').map((s) => s.trim()).filter(Boolean)
+                            )
+                          }
+                        />
+
+                        <div className="edit-acoes">
+                          <button
+                            className="btn-salvar-edicao"
+                            onClick={salvarEdicao}
+                            disabled={salvandoEdicao}
+                          >
+                            {salvandoEdicao ? '⏳ Salvando...' : '💾 Salvar'}
+                          </button>
+                          <button
+                            className="btn-cancelar-edicao"
+                            onClick={cancelarEdicao}
+                            disabled={salvandoEdicao}
+                          >
+                            Cancelar
+                          </button>
+                        </div>
                       </div>
+                    ) : (
+                      /* MODO LEITURA */
+                      <>
+                        <div className="conteudo-texto">
+                          <h4>Conteúdo</h4>
+                          <p>{aula.conteudo}</p>
+                        </div>
+
+                        {aula.materiais && aula.materiais.length > 0 && (
+                          <div className="materiais">
+                            <h4>📋 Materiais</h4>
+                            <ul>
+                              {aula.materiais.map((material, idx) => (
+                                <li key={idx}>{material}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+
+                        <button className="btn-editar-aula" onClick={() => iniciarEdicao(aula)}>
+                          ✏️ Editar esta aula
+                        </button>
+                      </>
                     )}
                   </div>
                 )}
