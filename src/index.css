@@ -17,7 +17,9 @@
 
   font: 18px/145% var(--sans);
   letter-spacing: 0.18px;
-  color-scheme: light dark;
+  /* App é desenhado apenas para tema claro (cards brancos, texto escuro).
+     Forçar 'light' evita que campos de formulário fiquem escuros no dark mode do SO. */
+  color-scheme: light;
   color: var(--text);
   background: var(--bg);
   font-synthesis: none;

@@ -82,6 +82,7 @@
   resize: vertical;
   transition: border-color 0.2s;
   color: #1f2937;
+  background-color: #fff;
   line-height: 1.6;
 }
 
