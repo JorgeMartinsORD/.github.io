@@ -4,6 +4,8 @@ import { useSupabase } from '../hooks/useSupabase';
 import { PreencherPerfil } from './PreencherPerfil';
 import { VisualizarAulas } from './VisualizarAulas';
 import { AvaliarAluno } from './AvaliarAluno';
+import { GravarAula } from './GravarAula';
+import { AjustarAula } from './AjustarAula';
 import './TelaAluno.css';
 
 interface Aluno {
@@ -20,7 +22,7 @@ interface Props {
   onVoltar: () => void;
 }
 
-type Tela = 'resumo' | 'preencher-perfil' | 'visualizar-aulas' | 'avaliar';
+type Tela = 'resumo' | 'preencher-perfil' | 'visualizar-aulas' | 'avaliar' | 'gravacoes' | 'ajustes';
 
 export const TelaAluno = ({ aluno, onVoltar }: Props) => {
   useEmusys();
@@ -121,6 +123,36 @@ export const TelaAluno = ({ aluno, onVoltar }: Props) => {
     );
   }
 
+  if (telaAtual === 'gravacoes') {
+    return (
+      <div className="tela-aluno">
+        <button className="btn-voltar" onClick={() => setTelaAtual('resumo')}>
+          ← Voltar
+        </button>
+        <GravarAula
+          aluno={{ id: alunoIdNum, nome: aluno.nome }}
+          disciplinaId={disciplinaId}
+          cicloNumero={cicloNumero}
+        />
+      </div>
+    );
+  }
+
+  if (telaAtual === 'ajustes') {
+    return (
+      <div className="tela-aluno">
+        <button className="btn-voltar" onClick={() => setTelaAtual('resumo')}>
+          ← Voltar
+        </button>
+        <AjustarAula
+          aluno={{ id: alunoIdNum, nome: aluno.nome }}
+          disciplinaId={disciplinaId}
+          cicloNumero={cicloNumero}
+        />
+      </div>
+    );
+  }
+
   // Tela de resumo (padrão)
   return (
     <div className="tela-aluno">
@@ -211,6 +243,18 @@ export const TelaAluno = ({ aluno, onVoltar }: Props) => {
           <span className="emoji">🎯</span>
           <span>Avaliar Aluno</span>
           <span className="desc">Aula 4</span>
+        </button>
+
+        <button className="btn-acao btn-gravacoes" onClick={() => setTelaAtual('gravacoes')}>
+          <span className="emoji">🎥</span>
+          <span>Gravações</span>
+          <span className="desc">Vídeos das aulas</span>
+        </button>
+
+        <button className="btn-acao btn-ajustes" onClick={() => setTelaAtual('ajustes')}>
+          <span className="emoji">✏️</span>
+          <span>Ajustes no Plano</span>
+          <span className="desc">Editar planejamento</span>
         </button>
       </div>
     </div>

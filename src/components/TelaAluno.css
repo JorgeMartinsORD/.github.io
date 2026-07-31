@@ -305,6 +305,24 @@
   box-shadow: 0 15px 40px rgba(250, 112, 154, 0.4);
 }
 
+.btn-gravacoes {
+  background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+  box-shadow: 0 10px 30px rgba(245, 87, 108, 0.3);
+}
+
+.btn-gravacoes:hover {
+  box-shadow: 0 15px 40px rgba(245, 87, 108, 0.4);
+}
+
+.btn-ajustes {
+  background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%);
+  box-shadow: 0 10px 30px rgba(24, 90, 157, 0.3);
+}
+
+.btn-ajustes:hover {
+  box-shadow: 0 15px 40px rgba(24, 90, 157, 0.4);
+}
+
 .acoes-ciclo {
   display: flex;
   justify-content: center;
