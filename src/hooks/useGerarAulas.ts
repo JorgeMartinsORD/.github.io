@@ -17,7 +17,7 @@ interface AulaGerada {
   numero: number;
   titulo: string;
   conteudo: string;
-  duracao: string;
+  duracao?: string;
   materiais?: string[];
 }
 

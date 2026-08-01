@@ -20,7 +20,7 @@ interface AulaGerada {
   numero: number;
   titulo: string;
   conteudo: string;
-  duracao: string;
+  duracao?: string;
   materiais?: string[];
   criadoPorIa?: boolean;
   videoUrl?: string;
@@ -230,7 +230,6 @@ export const VisualizarAulas = ({
                         <span className="badge-editado">✏️ Editado pelo professor</span>
                       )}
                     </h3>
-                    <p className="duracao">⏱️ {aula.duracao || 'Sem duração'}</p>
                   </div>
                   <div className="chevron">
                     {expandidas.includes(aula.numero) ? '▼' : '▶'}
@@ -247,14 +246,6 @@ export const VisualizarAulas = ({
                           className="edit-input"
                           value={rascunho.titulo}
                           onChange={(e) => atualizarRascunho('titulo', e.target.value)}
-                        />
-
-                        <label className="edit-label">Duração</label>
-                        <input
-                          className="edit-input"
-                          value={rascunho.duracao}
-                          placeholder="Ex: 50 minutos"
-                          onChange={(e) => atualizarRascunho('duracao', e.target.value)}
                         />
 
                         <label className="edit-label">Conteúdo / o que foi dado</label>

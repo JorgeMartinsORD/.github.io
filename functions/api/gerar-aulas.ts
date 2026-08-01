@@ -103,28 +103,24 @@ Responda em JSON válido com este formato exato (sem markdown, apenas JSON puro)
       "numero": 1,
       "titulo": "Título da aula",
       "conteudo": "Descrição detalhada do conteúdo e atividades",
-      "duracao": "50 minutos",
       "materiais": ["Material 1", "Material 2"]
     },
     {
       "numero": 2,
       "titulo": "...",
       "conteudo": "...",
-      "duracao": "50 minutos",
       "materiais": [...]
     },
     {
       "numero": 3,
       "titulo": "...",
       "conteudo": "...",
-      "duracao": "50 minutos",
       "materiais": [...]
     },
     {
       "numero": 4,
       "titulo": "...",
       "conteudo": "...",
-      "duracao": "50 minutos",
       "materiais": [...]
     }
   ]

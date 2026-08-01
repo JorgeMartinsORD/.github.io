@@ -1,0 +1,5 @@
+# This file configures environment variables for Cloudflare Pages Functions
+# The OPENAI_API_KEY should be set via the Cloudflare Dashboard
+
+[env.production]
+vars = { OPENAI_API_KEY = "placeholder" }
