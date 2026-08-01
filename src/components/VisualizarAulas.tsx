@@ -23,7 +23,17 @@ interface AulaGerada {
   duracao: string;
   materiais?: string[];
   criadoPorIa?: boolean;
+  videoUrl?: string;
 }
+
+// Extrai o ID do vídeo do YouTube (aceita youtu.be, watch?v=, embed, shorts)
+const youtubeId = (url?: string): string | null => {
+  if (!url) return null;
+  const m = url.match(
+    /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/
+  );
+  return m ? m[1] : null;
+};
 
 export const VisualizarAulas = ({
   aluno,
@@ -31,7 +41,7 @@ export const VisualizarAulas = ({
   cicloNumero,
   cronogramaReferencia,
 }: Props) => {
-  const { conteudo, perfil, avaliacao } = useSupabase();
+  const { conteudo, perfil, avaliacao, gravacao } = useSupabase();
   const { gerar, loading: gerandoAulas, error: erroGeracao } = useGerarAulas();
 
   const [aulas, setAulas] = useState<AulaGerada[]>([]);
@@ -56,7 +66,15 @@ export const VisualizarAulas = ({
 
       // Carregar conteúdo existente
       const aulasExistentes = await conteudo.carregar(aluno.id, disciplinaId, cicloNumero);
-      setAulas(aulasExistentes || []);
+
+      // Mesclar o link da gravação (opcional) de cada aula
+      const comGravacao = await Promise.all(
+        (aulasExistentes || []).map(async (a: any) => {
+          const g: any = await gravacao.carregar(aluno.id, disciplinaId, cicloNumero, a.numero);
+          return { ...a, videoUrl: g?.video_url || '' };
+        })
+      );
+      setAulas(comGravacao);
     } catch (err) {
       console.error('Erro ao carregar dados:', err);
     } finally {
@@ -139,6 +157,18 @@ export const VisualizarAulas = ({
     try {
       // criadoPorIa = false marca que o professor editou (acompanhamento do que foi dado)
       await conteudo.salvar(aluno.id, disciplinaId, cicloNumero, rascunho, cronogramaReferencia, false);
+
+      // Link da gravação (opcional) — salva se o professor informou
+      if (rascunho.videoUrl && rascunho.videoUrl.trim()) {
+        await gravacao.salvar(
+          aluno.id,
+          disciplinaId,
+          cicloNumero,
+          rascunho.numero,
+          rascunho.videoUrl.trim()
+        );
+      }
+
       setAulas((prev) =>
         prev.map((a) => (a.numero === rascunho.numero ? { ...rascunho, criadoPorIa: false } : a))
       );
@@ -249,6 +279,25 @@ export const VisualizarAulas = ({
                           }
                         />
 
+                        <label className="edit-label">🎥 Link da gravação (opcional)</label>
+                        <input
+                          className="edit-input"
+                          type="url"
+                          value={rascunho.videoUrl || ''}
+                          placeholder="https://youtu.be/... (vídeo da aula)"
+                          onChange={(e) => atualizarRascunho('videoUrl', e.target.value)}
+                        />
+                        {youtubeId(rascunho.videoUrl) && (
+                          <div className="video-preview">
+                            <iframe
+                              src={`https://www.youtube.com/embed/${youtubeId(rascunho.videoUrl)}`}
+                              title={`Gravação aula ${rascunho.numero}`}
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                            />
+                          </div>
+                        )}
+
                         <div className="edit-acoes">
                           <button
                             className="btn-salvar-edicao"
@@ -282,6 +331,26 @@ export const VisualizarAulas = ({
                                 <li key={idx}>{material}</li>
                               ))}
                             </ul>
+                          </div>
+                        )}
+
+                        {aula.videoUrl && (
+                          <div className="gravacao-aula">
+                            <h4>🎥 Gravação</h4>
+                            {youtubeId(aula.videoUrl) ? (
+                              <div className="video-preview">
+                                <iframe
+                                  src={`https://www.youtube.com/embed/${youtubeId(aula.videoUrl)}`}
+                                  title={`Gravação aula ${aula.numero}`}
+                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                  allowFullScreen
+                                />
+                              </div>
+                            ) : (
+                              <a className="video-link" href={aula.videoUrl} target="_blank" rel="noreferrer">
+                                ▶ Abrir vídeo em nova aba
+                              </a>
+                            )}
                           </div>
                         )}
 
